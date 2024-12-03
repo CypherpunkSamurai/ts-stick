@@ -1,0 +1,79 @@
+{
+  "name": "ts-stick",
+  "version": "1.0.0",
+  "description": "A Typescript on-screen joystick using DOM apis",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "unpkg": "dist/umd/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rimraf dist && npm run build:js && npm run build:types",
+    "build:js": "node esbuild.config.js",
+    "build:types": "tsc --emitDeclarationOnly",
+    "prepublishOnly": "npm run build",
+    "version": "standard-version",
+    "version:minor": "standard-version --release-as minor",
+    "version:major": "standard-version --release-as major",
+    "release": "pnpm run build && git push --follow-tags origin master && pnpm publish --access public"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-typescript": "^7.26.0",
+    "esbuild": "^0.19.12",
+    "esbuild-node-externals": "^1.15.0",
+    "typescript": "^5.7.2",
+    "standard-version": "^9.5.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./button": {
+      "import": "./dist/esm/Button.js",
+      "require": "./dist/cjs/Button.js",
+      "types": "./dist/types/Button.d.ts"
+    },
+    "./dpad": {
+      "import": "./dist/esm/Dpad.js",
+      "require": "./dist/cjs/Dpad.js",
+      "types": "./dist/types/Dpad.d.ts"
+    },
+    "./joystick": {
+      "import": "./dist/esm/Joystick.js",
+      "require": "./dist/cjs/Joystick.js",
+      "types": "./dist/types/Joystick.d.ts"
+    },
+    "./slider": {
+      "import": "./dist/esm/RetractableSlider.js",
+      "require": "./dist/cjs/RetractableSlider.js",
+      "types": "./dist/types/RetractableSlider.d.ts"
+    }
+  },
+  "author": "CypherpunkSamurai",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CypherpunkSamurai/ts-stick.git"
+  },
+  "keywords": [
+    "typescript",
+    "joystick",
+    "gamepad",
+    "controller",
+    "input",
+    "game",
+    "ui",
+    "interface",
+    "dom"
+  ],
+  "bugs": {
+    "url": "https://github.com/CypherpunkSamurai/ts-stick/issues"
+  },
+  "homepage": "https://github.com/CypherpunkSamurai/ts-stick#readme"
+}
