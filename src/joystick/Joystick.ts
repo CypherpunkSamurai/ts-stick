@@ -4,54 +4,121 @@
  * Joysick Controller
  */
 
-// Joystick Controller Options
-interface JoysickControllerOptions {
-  // uid - unique id to uniquely identify the joystick controller (default: random string)
+/**
+ * Interface representing configuration options for the Joystick controller
+ * 
+ * @interface JoysickControllerOptions
+ * 
+ * @property {string} [uid] - Unique identifier for the joystick controller. Defaults to a random string
+ * @property {HTMLElement} [container] - Container element where the joystick will be rendered. Defaults to document body
+ * @property {string} [top] - Top position of the joystick in CSS units. Defaults to '50%'
+ * @property {string} [left] - Left position of the joystick in CSS units. Defaults to '50%'
+ * @property {number} [rotate] - Rotation angle of the joystick in degrees. Defaults to 0
+ * @property {number} [radius] - Radius size of the joystick in rem units. Defaults to 3
+ * @property {string} [color] - Main color of the joystick. Defaults to '#CCC'
+ * @property {string} [thumbColor] - Color of the joystick's thumb/handle. Defaults to '#333'
+ * @property {function} [onInputCallback] - Callback function triggered when joystick position changes
+ * @property {boolean} [verboseLogging] - Enable detailed console logging. Defaults to false
+ */
+export interface JoysickControllerOptions {
+  /* uid - unique id to uniquely identify the joystick controller (default: random string) */
   uid?: string;
-  // conatiner - the container where to store the joystick (default: body)
+  /* container - the container where to store the joystick (default: body) */
   container?: HTMLElement;
-  // top - top position of the joystick (default: 50%)
+  /* top - top position of the joystick (default: 50%) */
   top?: string;
-  // left - left position of the joystick (default: 50%)
+  /* left - left position of the joystick (default: 50%) */
   left?: string;
-  // rotate - the degree of rotation of the joystick (default: 0deg)
+  /* rotate - the degree of rotation of the joystick (default: 0deg) */
   rotate?: number;
-  // radius - the radius of the joystick in rem (default: 3)
+  /* radius - the radius of the joystick in rem (default: 3) */
   radius?: number;
-  // color - the color of the joystick (default: #CCC)
+  /* color - the color of the joystick (default: #CCC) */
   color?: string;
-  // thumbColor - the color of the joystick thumb (default: #333)
+  /* thumbColor - the color of the joystick thumb (default: #333) */
   thumbColor?: string;
-  // onInputCallback - callback triggered when the joystick is moved
+  /* onInputCallback - callback triggered when the joystick is moved */
   onInputCallback?: (x: number, y: number) => void;
-  // verbose logging (default: false)
+  /* verbose logging (default: false) */
   verboseLogging?: boolean;
 }
 
 /**
- * The Joysick Controller
+ * A customizable on-screen joystick controller for touch and pointer input
+ * 
+ * @remarks
+ * The jostick is a draggable thumb that can be moved around the base in any direction.
+ * It can be dragged around the base to get the x and y position of the thumb.
+ * x and y values are normalized between -1 and 1 with a resolution of 0.01
+ * 
+ * @example
+ * ```typescript
+ * const joystick = new JoysickController({
+ *   container: document.getElementById('container'),
+ *   radius: 100,
+ *   color: '#CCC',
+ *   onInputCallback: (x, y) => console.log(x, y)
+ * });
+ * ```
+ * 
+ * @public
+ * @class JoysickController
+ * @property {string} uid - Unique identifier for the joystick
+ * @property {string} top - Top position of the joystick (CSS value)
+ * @property {string} left - Left position of the joystick (CSS value)
+ * @property {number} rotate - Rotation angle in degrees
+ * @property {number} radius - Radius of the joystick base in pixels
+ * @property {string} color - Background color of the joystick base
+ * @property {string} thumbColor - Color of the joystick thumb
+ * @property {(x: number, y: number) => void} onInputCallback - Callback function for joystick input
+ * @property {boolean} isPressed - Current press state of the joystick
+ * @property {HTMLElement} container - Container element for the joystick
+ * @property {boolean} verboseLogging - Enable verbose console logging
+ * @property {HTMLDivElement} base - The joystick base element
+ * @property {HTMLDivElement} baseThumb - The joystick thumb element
+ * @property {DOMRect | undefined} baseRect - Bounding rectangle of the base element
+ * @property {number} thumbMaxDistance - Maximum distance the thumb can move from center
+ * 
+ * @throws {Error} - If the container element is not found
  */
 export class JoysickController {
+  /** uid - unique id to uniquely identify the joystick controller (default: random string) */
   uid: string;
-  top: string;
-  left: string;
-  rotate: number;
-  radius: number;
-  color: string;
-  thumbColor: string;
-  // callbacks
-  onInputCallback: (x: number, y: number) => void;
-  // variables
-  isPressed: boolean;
+  /* container - the container where to store the joystick (default: body) */
   container: HTMLElement;
+  /* top - top position of the joystick (default: 50%) */
+  top: string;
+  /* left - left position of the joystick (default: 50%) */
+  left: string;
+  /* rotate - the degree of rotation of the joystick (default: 0deg) */
+  rotate: number;
+  /* radius - the radius of the joystick in rem (default: 3) */
+  radius: number;
+  /* color - the color of the joystick (default: #CCC) */
+  color: string;
+  /* thumbColor - the color of the joystick thumb (default: #333) */
+  thumbColor: string;
+  /* onInputCallback - callback triggered when the joystick is moved */
+  onInputCallback: (x: number, y: number) => void;
+  /* isPressed - flag to check if the joystick is pressed */
+  isPressed: boolean;
+  /* verbose logging (default: false) */
   verboseLogging: boolean;
+  /* base - the base element of the joystick */
   base: HTMLDivElement;
+  /* baseThumb - the thumb element of the joystick */
   baseThumb: HTMLDivElement;
+  /* baseRect - bounding rectangle of the base element */
   baseRect: DOMRect | undefined;
+  /* thumbMaxDistance - maximum distance the thumb can move from the center */
   thumbMaxDistance: number;
 
   /**
-   * Create a New JoysickController
+   * Creates a new instance of the JoysickController
+   * 
+   * @param options - Configuration options for the joystick controller
+   * @throws {Error} When the container element is not found during initialization
+   * 
    */
   constructor(options: JoysickControllerOptions) {
     // unique id
@@ -93,7 +160,9 @@ export class JoysickController {
   }
 
   /**
-   * Log
+   * Logs a message to the console if verbose logging is enabled.
+   * @param message - The message to be logged
+   * @remarks Only logs if verboseLogging is set to true
    */
   log(message: string) {
     if (this.verboseLogging)
@@ -101,7 +170,16 @@ export class JoysickController {
   }
 
   /**
-   * Init
+   * Initializes the joystick component.
+   * 
+   * @remarks
+   * This method performs the following tasks:
+   * 1. Validates the container element exists
+   * 2. Renders the joystick UI
+   * 3. Sets up event listeners for joystick interactions
+   * 4. Sets up window resize handling
+   * 
+   * @throws {Error} When the button container element is not found
    */
   init() {
     // log
@@ -128,7 +206,22 @@ export class JoysickController {
   }
 
   /**
-   * Render
+   * Renders the joystick component with styling.
+   * Applies CSS styling to both the base and thumb elements of the joystick.
+   * The base element receives glassmorphic styling with rotation and positioning.
+   * The thumb element is styled as a smaller circle within the base.
+   * Finally appends the base element to the container.
+   * 
+   * @remarks
+   * The styling includes:
+   * - Size based on radius
+   * - Color and opacity
+   * - Positioning and rotation
+   * - Glassmorphic effects (blur, shadows)
+   * - Touch interaction handling
+   * - Transition animations
+   * 
+   * @returns void
    */
   render() {
     // create styles
@@ -168,11 +261,6 @@ export class JoysickController {
     `;
     this.container.appendChild(this.base);
   }
-
-  /**
-   * UpdateUI
-   */
-  updateUI() {}
 
   /**
    * Update Container Rectangle
